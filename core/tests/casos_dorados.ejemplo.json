@@ -1,0 +1,27 @@
+{
+  "_advertencia": "PLANTILLA. Los numeros son inventados. Daniel la reemplaza por casos_dorados.json con cinco cotizaciones calculadas a mano en Excel.",
+  "_como_llenarla": "Para cada caso: haz la cuenta en Excel con las tasas verificadas, anota los totales en 'esperado' y describe en 'por_que_este_caso' que escenario cubre. Los cinco casos deben cubrir: medicina de patente, IGI en cero, IGI mayor que cero, flete alto y una fraccion distinta.",
+  "casos": [
+    {
+      "nombre": "ejemplo-insulina-patente",
+      "por_que_este_caso": "Cubre el camino de medicina de patente, donde el IVA deberia ser cero.",
+      "entrada": {
+        "fraccion": "3004.31.01",
+        "valor_mercancia_usd": "50000",
+        "flete_usd": "3000",
+        "seguro_usd": "400",
+        "tipo_de_cambio": "17.50",
+        "origen": "Alemania",
+        "destino": "Guadalajara, Jalisco",
+        "es_medicina_de_patente": true
+      },
+      "esperado": {
+        "valor_en_aduana_mxn": "934950.00",
+        "igi_mxn": "0.00",
+        "dta_mxn": "0.00",
+        "iva_mxn": "0.00",
+        "total_mxn": "934950.00"
+      }
+    }
+  ]
+}

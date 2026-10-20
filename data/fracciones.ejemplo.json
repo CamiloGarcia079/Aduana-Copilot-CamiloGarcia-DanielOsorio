@@ -1,0 +1,48 @@
+{
+  "_advertencia": "DATOS DE EJEMPLO. Las tasas no estan verificadas y no sirven para cotizar. Existen para que la interfaz y el agente se puedan construir mientras se curan los datos reales en data/fracciones.json.",
+  "version": "ejemplo-1",
+  "fracciones": [
+    {
+      "fraccion": "3004.31.01",
+      "descripcion": "Medicamentos que contengan insulina, acondicionados para la venta al por menor",
+      "igi_pct": null,
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": "",
+      "notas": "Verificar en SIAVI. La insulina suele tener trato preferencial."
+    },
+    {
+      "fraccion": "3004.32.01",
+      "descripcion": "Medicamentos que contengan hormonas corticosteroides, acondicionados para la venta al por menor",
+      "igi_pct": null,
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "fraccion": "3004.20.01",
+      "descripcion": "Medicamentos que contengan antibióticos, acondicionados para la venta al por menor",
+      "igi_pct": null,
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "fraccion": "3004.90.99",
+      "descripcion": "Otros medicamentos acondicionados para la venta al por menor",
+      "igi_pct": null,
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": "",
+      "notas": "Fracción de uso general. Clasificar aquí solo si ninguna fracción específica aplica."
+    },
+    {
+      "fraccion": "3003.90.99",
+      "descripcion": "Otros medicamentos sin acondicionar para la venta al por menor",
+      "igi_pct": null,
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    }
+  ]
+}

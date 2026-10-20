@@ -1,0 +1,916 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+/*
+ * Aduana-Copilot
+ *
+ * La idea de la pantalla: una cotizacion de importacion no es un tablero, es
+ * un documento. Alguien la va a imprimir, la va a mandar por correo y la va a
+ * discutir con su agente aduanal. Por eso la hoja de liquidacion se ve como un
+ * papel con casillas y filetes, con las cifras alineadas a la derecha para
+ * poder sumarlas con la vista, y con la base legal de cada renglon visible
+ * debajo del numero en lugar de escondida en un globo de ayuda.
+ *
+ * El color se gasta en un solo lugar: el verde de sello, que marca lo que esta
+ * verificado. Lo que no esta verificado se marca en oxblood. Todo lo demas es
+ * papel y tinta.
+ *
+ * Es una pantalla clara a proposito, sin modo oscuro: el papel es parte del
+ * argumento.
+ */
+
+:root {
+  --papel: #fcfbf8;
+  --papel-hundido: #f5f3ed;
+  --tinta: #1c2321;
+  --tinta-suave: #5f6b63;
+  --sello: #1f5c45;
+  --sello-claro: #eff2ec;
+  --filete: #d8d4c9;
+  --filete-fuerte: #b4ae9e;
+  --bandera: #8c2f26;
+  --bandera-clara: #f9efed;
+
+  --serif: 'Spectral', Georgia, serif;
+  --sans: 'Public Sans', system-ui, sans-serif;
+
+  /* Escala tipografica: 12 14 16 19 23 30 */
+  --t-nota: 12px;
+  --t-base: 14px;
+  --t-medio: 16px;
+  --t-alto: 19px;
+  --t-titulo: 23px;
+  --t-cifra: 30px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--papel-hundido);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--t-base);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cifras: alineadas en columna y sin que el 1 ocupe menos que el 8. */
+.cifra {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sello);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Marco ---------- */
+
+.marco {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.cinta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 14px 24px;
+  background: var(--papel);
+  border-bottom: 1px solid var(--filete);
+}
+
+.cinta__nombre {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: var(--t-alto);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.cinta__que-es {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+  max-width: 34ch;
+}
+
+/*
+ * La insignia de vigencia de los datos.
+ *
+ * Va arriba y siempre visible porque es el dato que decide si la cotizacion
+ * sirve. Una cotizacion con aranceles de hace dos anos no es una cotizacion.
+ */
+.vigencia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+  padding: 6px 12px;
+  border: 1px solid var(--filete);
+  border-radius: 2px;
+  background: var(--sello-claro);
+  font-size: var(--t-nota);
+  color: var(--sello);
+}
+
+.vigencia--hueco {
+  background: var(--bandera-clara);
+  border-color: color-mix(in srgb, var(--bandera) 28%, transparent);
+  color: var(--bandera);
+}
+
+.vigencia__punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+/* ---------- Taller: peticion a la izquierda, hoja a la derecha ---------- */
+
+.taller {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding: 24px;
+  max-width: 1320px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 1000px) {
+  .taller {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+    gap: 16px;
+  }
+}
+
+/* ---------- Columna de la peticion ---------- */
+
+.peticion {
+  background: var(--papel);
+  border: 1px solid var(--filete);
+  border-radius: 3px;
+  padding: 18px;
+  position: sticky;
+  top: 24px;
+}
+
+@media (max-width: 1000px) {
+  .peticion {
+    position: static;
+  }
+}
+
+.peticion__titulo {
+  margin: 0 0 4px;
+  font-family: var(--serif);
+  font-size: var(--t-medio);
+  font-weight: 600;
+}
+
+.peticion__ayuda {
+  margin: 0 0 16px;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+.campo {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.campo__rotulo {
+  display: block;
+  margin-bottom: 4px;
+  font-size: var(--t-nota);
+  color: var(--tinta-suave);
+}
+
+.campo input,
+.campo textarea,
+.campo select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--filete-fuerte);
+  border-radius: 2px;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--t-base);
+}
+
+.campo input.cifra,
+.campo--numero input {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.campo textarea {
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.5;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: color-mix(in srgb, var(--tinta-suave) 65%, transparent);
+}
+
+.terna {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* Casilla de medicina de patente: es una declaracion, no una preferencia. */
+.declara {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 10px;
+  margin-bottom: 14px;
+  border: 1px solid var(--filete);
+  border-radius: 2px;
+  background: var(--papel-hundido);
+  cursor: pointer;
+}
+
+.declara input {
+  margin: 2px 0 0;
+  accent-color: var(--sello);
+  flex: none;
+}
+
+.declara__texto {
+  font-size: var(--t-nota);
+  line-height: 1.45;
+}
+
+.declara__texto strong {
+  display: block;
+  font-size: var(--t-base);
+  font-weight: 500;
+}
+
+.declara__texto span {
+  color: var(--tinta-suave);
+}
+
+.boton {
+  width: 100%;
+  padding: 11px 16px;
+  border: 1px solid var(--sello);
+  border-radius: 2px;
+  background: var(--sello);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: var(--t-base);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.boton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sello) 88%, #000);
+}
+
+.boton:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.boton--discreto {
+  background: transparent;
+  border-color: var(--filete-fuerte);
+  color: var(--tinta);
+  width: auto;
+  padding: 8px 14px;
+}
+
+.boton--discreto:hover:not(:disabled) {
+  background: var(--papel-hundido);
+}
+
+/* Ejemplos para cargar con un clic. */
+.ejemplos {
+  margin: 0 0 16px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--filete);
+}
+
+.ejemplos__rotulo {
+  display: block;
+  margin-bottom: 7px;
+  font-size: var(--t-nota);
+  color: var(--tinta-suave);
+}
+
+.ejemplos__lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ejemplo {
+  padding: 5px 10px;
+  border: 1px solid var(--filete-fuerte);
+  border-radius: 2px;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--t-nota);
+  cursor: pointer;
+}
+
+.ejemplo:hover {
+  border-color: var(--sello);
+  color: var(--sello);
+}
+
+.aviso-error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--bandera) 35%, transparent);
+  border-radius: 2px;
+  background: var(--bandera-clara);
+  color: var(--bandera);
+  font-size: var(--t-nota);
+}
+
+.aviso-error ul {
+  margin: 6px 0 0;
+  padding-inline-start: 18px;
+}
+
+/* ---------- La hoja de liquidacion ---------- */
+
+.hoja {
+  background: var(--papel);
+  border: 1px solid var(--filete-fuerte);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.hoja__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--filete);
+}
+
+.hoja__titulo {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: var(--t-titulo);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hoja__emitida {
+  margin: 2px 0 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+.hoja__folio {
+  text-align: right;
+}
+
+.hoja__folio dt {
+  font-size: var(--t-nota);
+  color: var(--tinta-suave);
+}
+
+.hoja__folio dd {
+  margin: 0;
+  font-size: var(--t-medio);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Las casillas de la mercancia.
+ *
+ * Es la parte que mas se parece a un pedimento: campos en rejilla, separados
+ * por filetes, cada uno con su rotulo pequeno. La estructura es la que dice
+ * "esto es un documento oficial", sin necesidad de versalitas ni adornos.
+ */
+.casillas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  border-bottom: 1px solid var(--filete);
+}
+
+.casilla {
+  padding: 12px 20px;
+  border-inline-end: 1px solid var(--filete);
+}
+
+.casilla:last-child {
+  border-inline-end: none;
+}
+
+.casilla dt {
+  font-size: var(--t-nota);
+  color: var(--tinta-suave);
+  margin-bottom: 2px;
+}
+
+.casilla dd {
+  margin: 0;
+  font-size: var(--t-base);
+}
+
+.casilla--ancha {
+  grid-column: span 2;
+}
+
+@media (max-width: 620px) {
+  .casilla {
+    border-inline-end: none;
+    border-bottom: 1px solid var(--filete);
+  }
+
+  .casilla--ancha {
+    grid-column: auto;
+  }
+}
+
+/* ---------- La liquidacion renglon por renglon ---------- */
+
+.liquidacion {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.liquidacion caption {
+  padding: 14px 20px 8px;
+  text-align: start;
+  font-family: var(--serif);
+  font-size: var(--t-medio);
+  font-weight: 600;
+}
+
+.liquidacion thead th {
+  padding: 6px 20px;
+  border-bottom: 1px solid var(--filete-fuerte);
+  font-size: var(--t-nota);
+  font-weight: 500;
+  color: var(--tinta-suave);
+  text-align: end;
+}
+
+.liquidacion thead th:first-child {
+  text-align: start;
+}
+
+.liquidacion td {
+  padding: 11px 20px 0;
+  vertical-align: baseline;
+  text-align: end;
+}
+
+.liquidacion td:first-child {
+  text-align: start;
+}
+
+.liquidacion tbody tr:not(:last-child) .renglon__fuente {
+  border-bottom: 1px solid var(--filete);
+}
+
+.renglon__nombre {
+  font-size: var(--t-medio);
+}
+
+.renglon__monto {
+  font-size: var(--t-medio);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * La linea de respaldo, debajo de cada cifra.
+ *
+ * Es la razon de ser del producto: la fuente va escrita a la vista, no en un
+ * tooltip. Ocupa su propio renglon de la tabla para que no compita con el
+ * numero y para que al imprimir se quede pegada a el.
+ */
+.renglon__fuente {
+  padding: 2px 20px 11px;
+  font-size: var(--t-nota);
+  color: var(--tinta-suave);
+  text-align: start;
+}
+
+.renglon__fuente--hueco {
+  color: var(--bandera);
+}
+
+.respaldo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.respaldo__marca {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fila del valor en aduana: es la base, no un impuesto. */
+.liquidacion .base .renglon__nombre,
+.liquidacion .base .renglon__monto {
+  font-weight: 500;
+}
+
+/* ---------- Total ---------- */
+
+.total {
+  padding: 16px 20px;
+  border-top: 2px solid var(--tinta);
+  background: var(--sello-claro);
+}
+
+/*
+ * El rotulo y la cifra comparten linea base, como en cualquier documento de
+ * cobro. Es lo que hace que el ojo lea "total estimado: tanto" de un golpe en
+ * lugar de tener que emparejar dos bloques sueltos.
+ */
+.total__linea {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  margin: 0;
+}
+
+.total__pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.total__rotulo {
+  font-family: var(--serif);
+  font-size: var(--t-alto);
+  font-weight: 600;
+}
+
+.total__nota {
+  font-size: var(--t-nota);
+  color: var(--tinta-suave);
+  max-width: 48ch;
+}
+
+.total__monto {
+  font-size: var(--t-cifra);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Sello de confianza ---------- */
+
+.sello {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 11px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-size: var(--t-nota);
+}
+
+.sello--alta {
+  color: var(--sello);
+  background: var(--sello-claro);
+}
+
+.sello--media,
+.sello--baja {
+  color: var(--bandera);
+  background: var(--bandera-clara);
+}
+
+.sello__punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+/* ---------- Advertencia ---------- */
+
+.advertencia {
+  display: flex;
+  gap: 10px;
+  padding: 13px 20px;
+  border-top: 1px solid color-mix(in srgb, var(--bandera) 30%, transparent);
+  background: var(--bandera-clara);
+  color: var(--bandera);
+  font-size: var(--t-base);
+}
+
+.advertencia__marca {
+  flex: none;
+  font-weight: 600;
+}
+
+/* ---------- Bloques de abajo ---------- */
+
+.pliegos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.pliego {
+  background: var(--papel);
+  border: 1px solid var(--filete);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.pliego__titulo {
+  margin: 0;
+  padding: 14px 18px 10px;
+  font-family: var(--serif);
+  font-size: var(--t-medio);
+  font-weight: 600;
+}
+
+.pliego__cuenta {
+  font-family: var(--sans);
+  font-size: var(--t-nota);
+  font-weight: 400;
+  color: var(--tinta-suave);
+}
+
+.pliego__ayuda {
+  margin: 0;
+  padding: 0 18px 12px;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+/* ---------- Supuestos ---------- */
+
+.supuestos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--filete);
+}
+
+.supuesto {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--filete);
+}
+
+.supuesto:last-child {
+  border-bottom: none;
+}
+
+.supuesto__que {
+  margin: 0 0 4px;
+  font-size: var(--t-base);
+}
+
+.supuesto__detalle {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+.supuesto__detalle + .supuesto__detalle {
+  margin-top: 3px;
+}
+
+.supuesto__afecta {
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, var(--bandera) 35%, transparent);
+  border-radius: 2px;
+  background: var(--bandera-clara);
+  color: var(--bandera);
+  font-size: 11px;
+  vertical-align: 1px;
+}
+
+/* ---------- Documentos ---------- */
+
+.papeles {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--filete);
+}
+
+.papel {
+  display: flex;
+  gap: 11px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--filete);
+}
+
+.papel:last-child {
+  border-bottom: none;
+}
+
+.papel__casilla {
+  width: 13px;
+  height: 13px;
+  margin-top: 4px;
+  border: 1px solid var(--filete-fuerte);
+  border-radius: 1px;
+  flex: none;
+}
+
+.papel__nombre {
+  margin: 0;
+  font-size: var(--t-base);
+}
+
+.papel__quien {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+.papel__opcional {
+  color: var(--tinta-suave);
+  font-style: italic;
+}
+
+/* ---------- Costos aparte ---------- */
+
+.aparte {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--filete);
+}
+
+.aparte li {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--filete);
+}
+
+.aparte li:last-child {
+  border-bottom: none;
+}
+
+.aparte__monto {
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-suave);
+  text-align: end;
+  flex: none;
+}
+
+/* ---------- Tramo del envio ---------- */
+
+.tramo {
+  height: 190px;
+  border-top: 1px solid var(--filete);
+  background: var(--papel-hundido);
+}
+
+.tramo .leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--papel-hundido);
+  font-family: var(--sans);
+}
+
+/* El mapa es contexto, no protagonista: se aclara para que no grite. */
+.tramo .leaflet-tile-pane {
+  filter: saturate(0.35) brightness(1.06) contrast(0.92);
+}
+
+.tramo__pie {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 18px;
+  border-top: 1px solid var(--filete);
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+/* ---------- Estado vacio ---------- */
+
+.en-blanco {
+  padding: 56px 28px;
+  text-align: center;
+  background: var(--papel);
+  border: 1px dashed var(--filete-fuerte);
+  border-radius: 3px;
+}
+
+.en-blanco__titulo {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: var(--t-alto);
+  font-weight: 600;
+}
+
+.en-blanco p {
+  margin: 0 auto;
+  max-width: 48ch;
+  color: var(--tinta-suave);
+}
+
+/* ---------- Acciones de la hoja ---------- */
+
+.acciones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-top: 1px solid var(--filete);
+}
+
+/* Solo para lectores de pantalla. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Impresion ---------- */
+
+/*
+ * La cotizacion se imprime o se guarda en PDF desde el navegador.
+ *
+ * Se esconde todo lo que no es el documento: el formulario, los ejemplos y los
+ * botones no tienen sentido en papel. Las fuentes de cada renglon se quedan,
+ * porque son justamente lo que el cliente va a querer revisar con su agente.
+ */
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .cinta,
+  .peticion,
+  .acciones,
+  .tramo {
+    display: none;
+  }
+
+  .taller {
+    display: block;
+    padding: 0;
+    max-width: none;
+  }
+
+  .hoja,
+  .pliego {
+    border-color: #999;
+    break-inside: avoid;
+  }
+
+  .pliegos {
+    display: block;
+  }
+
+  .pliego {
+    margin-top: 16px;
+  }
+}

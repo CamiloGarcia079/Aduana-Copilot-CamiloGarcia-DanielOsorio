@@ -1,0 +1,23 @@
+# Dependencias
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Compilados
+dist/
+build/
+
+# Secretos. El .env nunca se sube: lleva la llave del reto.
+.env
+.env.local
+
+# Entorno
+.DS_Store
+.idea/
+.vscode/
+
+# Pruebas
+.pytest_cache/
+.coverage

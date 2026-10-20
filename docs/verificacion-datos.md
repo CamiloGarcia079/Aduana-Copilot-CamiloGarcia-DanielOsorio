@@ -104,3 +104,23 @@
 | **IVA** | 0.0% | Art. 25 Fracc. III y Art. 2-A Fracc. I inc. b LIVA; Art. 7 RLIVA | 2026-10-20 | **Supuesto auditado** (requiere registro de medicina de patente) |
 | **Prevalidación** | Rango: $310.00 – $350.00 MXN | Art. 16-A Ley Aduanera; RGCE 2026 Regla 1.8.3 | 2026-10-20 | **Estimado (Rango)** |
 | **Honorarios Agente**| Rango: 0.45% – 0.80% (Piso $3,500 – $6,500 MXN) | Prácticas de mercado aduanal farmacéutico / CAAAREM | 2026-10-20 | **Estimado (Rango)** |
+
+---
+
+## Revisión del 20 de octubre de 2026 (Camilo, con apoyo de IA)
+
+Qué se comprobó y qué no. Solo lo primero quedó marcado como `verificado`.
+
+| Dato | Resultado | Evidencia |
+|---|---|---|
+| IVA general 16% (art. 1o LIVA) | Verificado | PDF de la Cámara de Diputados, `LeyesBiblio/pdf/LIVA.pdf` (última reforma DOF 12-11-2021) |
+| IVA 0% medicinas de patente (art. 2-A fracc. I inciso b) | Verificado | Mismo PDF. La condición de "medicina de patente" sigue siendo un supuesto declarado por el cliente |
+| Base del IVA en importación (art. 27) | Solo copias no oficiales | mley.mx; el PDF oficial llegó cortado antes de ese artículo |
+| DTA 8 al millar (art. 49 fracc. I LFD) | Sin comprobar | Copias no oficiales (mley.mx, idconline.mx). El PDF oficial llegó cortado antes del art. 49 |
+| DTA cuota fija por tratado (art. 49 fracc. IV) | Duda abierta, ahora visible | Fuentes secundarias dan $462 por operación en 2026 y la aplican a mercancía con trato de tratado (p. ej. Unión Europea). La cotización lo avisa como supuesto |
+| IGI por fracción (56) | Sin comprobar | No se cotejó fracción por fracción contra el texto oficial |
+| LIGIE vigente | Parcial | El decreto del DOF 29-12-2025 (vigente 1-ene-2026) modifica los capítulos 39, 50 a 63, 72, 73 y 87. No toca el capítulo 30. Hay decretos posteriores (23-04-2026, 13-10-2026) que no se revisaron |
+
+Pendiente para cerrar la verificación de IGI y DTA: abrir el texto oficial del art. 49 de la LFD y cada fracción de la LIGIE vigente en el DOF o en SIAVI, y cambiar el estado a `verificado` solo en lo que se haya visto.
+
+Casos dorados: los casos 1 a 5 se generaron con apoyo de IA. El caso 6 (IGI 10% e IVA 16%) se recalculó aparte, paso a paso con Decimal. Conviene repasarlos en Excel antes de la demo.

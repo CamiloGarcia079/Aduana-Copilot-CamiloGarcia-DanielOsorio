@@ -10,7 +10,9 @@
     "fundamento_legal": "Artículo 49, Fracción I de la Ley Federal de Derechos (LFD)",
     "fuente": "Ley Federal de Derechos (Cámara de Diputados / Diario Oficial de la Federación)",
     "fecha_consulta": "2026-10-20",
-    "es_estimado": false
+    "es_estimado": false,
+    "cuota_fija_tratados_mxn": 462,
+    "nota_cuota_fija": "Art. 49 fracc. IV LFD: cuota fija por operación (462 MXN en 2026 según tlcasociados.com.mx, fuente secundaria) cuando por tratado no se cobran contribuciones ad valorem, p. ej. Unión Europea; exento para origen T-MEC/Chile/etc. No confirmado en texto oficial."
   },
   "iva": {
     "concepto": "Impuesto al Valor Agregado",
@@ -30,7 +32,11 @@
     "supuesto_auditoria": {
       "condicion": "Aplica tasa 0% de IVA bajo el supuesto de que el producto importado califique como medicina de patente (especialidad farmacéutica terminada y dosificada con Registro Sanitario vigente otorgado por COFEPRIS conforme al Art. 7 RLIVA).",
       "riesgo_si_no_cumple": "Si la mercancía fuese principio activo a granel no dosificado o insumo químico sin acreditar el supuesto de medicina de patente, la autoridad aduanera podría determinar la tasa general del 16% de IVA."
-    }
+    },
+    "estado": "verificado",
+    "verificado_por": "Camilo García (revisión asistida por IA)",
+    "fecha_verificacion": "2026-10-20",
+    "evidencia": "Art. 1o (tasa 16%) y art. 2-A fracc. I inciso b) (medicinas de patente, tasa 0%) leídos en el PDF de la Cámara de Diputados, https://www.diputados.gob.mx/LeyesBiblio/pdf/LIVA.pdf (última reforma DOF 12-11-2021). La base en importación (art. 27) solo se confirmó en copias no oficiales."
   },
   "prevalidacion": {
     "concepto": "Prevalidación electrónica de datos de pedimento",
@@ -56,7 +62,7 @@
     "es_estimado": true,
     "porcentaje_valor_aduana": {
       "min_pct": 0.45,
-      "max_pct": 0.80
+      "max_pct": 0.8
     },
     "cuota_minima_piso_mxn": {
       "min": 3500.0,

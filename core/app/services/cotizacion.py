@@ -208,6 +208,26 @@ def cotizar(peticion: CotizacionRequest) -> CotizacionResponse:
             )
         )
 
+    if dta_param.get("tasa_pct") is not None:
+        cuota = dta_param.get("cuota_fija_tratados_mxn")
+        supuestos.append(
+            Supuesto(
+                clave="dta_regimen_general",
+                descripcion="El DTA se calculó con la tasa general de 8 al millar.",
+                por_que=(
+                    "Si la mercancía entra con trato preferencial de un tratado (por "
+                    "ejemplo, Unión Europea), el DTA puede ser una cuota fija por "
+                    f"operación{f' (alrededor de ${cuota} en 2026)' if cuota else ''}, "
+                    "o no cobrarse (T-MEC). El motor no sabe si se acreditará el origen."
+                ),
+                como_verificar=(
+                    "Pregunta a tu agente aduanal si se aplicará preferencia de tratado "
+                    "y qué DTA saldrá en el pedimento (art. 49 de la Ley Federal de Derechos)."
+                ),
+                afecta_al_total=True,
+            )
+        )
+
     # ---- IVA, sobre el valor en aduana ya con IGI y DTA ----
     iva_param = params.get("iva", {})
     base_iva = valor_en_aduana + igi.monto_mxn + dta.monto_mxn

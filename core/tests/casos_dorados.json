@@ -1,5 +1,5 @@
 {
-  "_descripcion": "Casos dorados calculados a mano en Excel para validacion formal del motor y del jurado.",
+  "_descripcion": "Casos dorados con cuentas hechas paso a paso fuera del motor (Decimal, redondeo half-up a centavos). Los casos 1 a 5 se generaron con ayuda de IA y el caso 6 se recalculó de forma independiente; conviene que una persona los repase en Excel antes de la demo.",
   "casos": [
     {
       "nombre": "caso-1-insulina-patente-igi-0",
@@ -104,6 +104,27 @@
         "dta_mxn": "33696.00",
         "iva_mxn": "0.00",
         "total_mxn": "4245696.00"
+      }
+    },
+    {
+      "nombre": "caso-6-generico-igi-10-iva-16",
+      "por_que_este_caso": "Cubre IGI mayor a cero y IVA general del 16% (medicamento que NO es de patente), el camino donde el IVA sí pesa en el total.",
+      "entrada": {
+        "fraccion": "3004.90.99",
+        "valor_mercancia_usd": "15000.00",
+        "flete_usd": "1500.00",
+        "seguro_usd": "250.00",
+        "tipo_de_cambio": "19.5000",
+        "origen": "India",
+        "destino": "Guadalajara, Jalisco",
+        "es_medicina_de_patente": false
+      },
+      "esperado": {
+        "valor_en_aduana_mxn": "326625.00",
+        "igi_mxn": "32662.50",
+        "dta_mxn": "2613.00",
+        "iva_mxn": "57904.08",
+        "total_mxn": "419804.58"
       }
     }
   ]

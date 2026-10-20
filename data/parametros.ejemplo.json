@@ -1,0 +1,43 @@
+{
+  "_advertencia": "DATOS DE EJEMPLO. Ninguna tasa esta verificada en fuente oficial. No sirven para cotizar.",
+  "version": "ejemplo-1",
+  "dta": {
+    "concepto": "Derecho de Trámite Aduanero",
+    "tasa_pct": null,
+    "base": "valor_en_aduana",
+    "estado": "ejemplo_sin_verificar",
+    "fuente": "",
+    "fecha_consulta": "",
+    "notas": "Verificar en la Ley Federal de Derechos, articulo 179. Se habla de 0.8% del valor en aduana, pero hay que leerlo en el texto vigente."
+  },
+  "iva": {
+    "concepto": "Impuesto al Valor Agregado",
+    "tasa_general_pct": null,
+    "tasa_medicina_de_patente_pct": null,
+    "base": "valor_en_aduana + igi + dta",
+    "estado": "ejemplo_sin_verificar",
+    "fuente": "",
+    "fecha_consulta": "",
+    "notas": "Es el dato mas delicado del proyecto. Verificar el articulo 2-A de la Ley del IVA y su reglamento. Mientras no este verificado, el motor lo reporta como supuesto y no como hecho."
+  },
+  "prevalidacion": {
+    "concepto": "Prevalidación del pedimento",
+    "monto_min_mxn": null,
+    "monto_max_mxn": null,
+    "estado": "ejemplo_sin_verificar",
+    "fuente": "",
+    "fecha_consulta": "",
+    "notas": "Va siempre como rango, nunca como cifra unica. Cambia por aduana y por prevalidador."
+  },
+  "honorarios_agente_aduanal": {
+    "concepto": "Honorarios del agente aduanal",
+    "tipo": "rango_porcentual",
+    "pct_min": null,
+    "pct_max": null,
+    "base": "valor_en_aduana",
+    "estado": "ejemplo_sin_verificar",
+    "fuente": "",
+    "fecha_consulta": "",
+    "notas": "Se negocia con cada agente. Va como rango."
+  }
+}

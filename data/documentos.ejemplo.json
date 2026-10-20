@@ -1,0 +1,81 @@
+{
+  "_advertencia": "DATOS DE EJEMPLO. La lista es orientativa y sus fuentes estan vacias. Verificar cada requisito con COFEPRIS y con un agente aduanal antes de usarla para cotizar.",
+  "version": "ejemplo-1",
+  "documentos": [
+    {
+      "clave": "registro_sanitario",
+      "nombre": "Registro sanitario del medicamento",
+      "quien_lo_emite": "COFEPRIS",
+      "obligatorio": true,
+      "aplica_a": ["medicamento_terminado"],
+      "notas": "Lo tiene que tener el importador a su nombre. Es el requisito que más tarda.",
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "clave": "permiso_importacion",
+      "nombre": "Permiso sanitario de importación",
+      "quien_lo_emite": "COFEPRIS",
+      "obligatorio": true,
+      "aplica_a": ["medicamento_terminado", "insumo"],
+      "notas": "Se pide por embarque, no una sola vez.",
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "clave": "aviso_funcionamiento",
+      "nombre": "Aviso de funcionamiento del establecimiento",
+      "quien_lo_emite": "COFEPRIS",
+      "obligatorio": true,
+      "aplica_a": ["almacen", "distribuidor"],
+      "notas": "Requiere e.firma. Para almacenes de medicamentos puede exigirse licencia sanitaria en lugar de aviso.",
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "clave": "responsable_sanitario",
+      "nombre": "Responsable sanitario designado",
+      "quien_lo_emite": "COFEPRIS",
+      "obligatorio": true,
+      "aplica_a": ["almacen", "distribuidor"],
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "clave": "factura_comercial",
+      "nombre": "Factura comercial del proveedor",
+      "quien_lo_emite": "Proveedor en el extranjero",
+      "obligatorio": true,
+      "aplica_a": ["todos"],
+      "notas": "Sustenta el valor de la mercancía ante la aduana.",
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "clave": "lista_empaque",
+      "nombre": "Lista de empaque",
+      "quien_lo_emite": "Proveedor en el extranjero",
+      "obligatorio": true,
+      "aplica_a": ["todos"],
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    },
+    {
+      "clave": "certificado_origen",
+      "nombre": "Certificado de origen",
+      "quien_lo_emite": "Proveedor o autoridad del país de origen",
+      "obligatorio": false,
+      "aplica_a": ["todos"],
+      "notas": "Solo si se quiere aplicar una tasa preferencial de un tratado comercial.",
+      "estado": "ejemplo_sin_verificar",
+      "fuente": "",
+      "fecha_consulta": ""
+    }
+  ]
+}

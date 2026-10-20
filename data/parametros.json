@@ -1,0 +1,70 @@
+{
+  "dta": {
+    "concepto": "Derecho de Trámite Aduanero",
+    "clave": "DTA",
+    "tasa_pct": 0.8,
+    "factor": 0.008,
+    "base_calculo": "valor_aduana",
+    "tipo": "fijo_porcentual",
+    "descripcion": "8 al millar sobre el valor que tengan los bienes para efectos del IGI (valor en aduana)",
+    "fundamento_legal": "Artículo 49, Fracción I de la Ley Federal de Derechos (LFD)",
+    "fuente": "Ley Federal de Derechos (Cámara de Diputados / Diario Oficial de la Federación)",
+    "fecha_consulta": "2026-10-20",
+    "es_estimado": false
+  },
+  "iva": {
+    "concepto": "Impuesto al Valor Agregado",
+    "clave": "IVA",
+    "tasa_pct": 0.0,
+    "tasa_general_pct": 16,
+    "tasa_medicina_de_patente_pct": 0,
+    "factor": 0.0,
+    "base_calculo": "valor_aduana_mas_contribuciones",
+    "tipo": "fijo_porcentual",
+    "descripcion": "Tasa del 0% en medicinas de patente y 16% en tasa general",
+    "fundamento_legal": "Artículo 25, Fracción III en relación directa con el Artículo 2-A, Fracción I, inciso b) de la Ley del IVA; Artículo 7 del Reglamento de la Ley del IVA",
+    "fuente": "Ley del Impuesto al Valor Agregado y Reglamento de la LIVA (Diario Oficial de la Federación)",
+    "fecha_consulta": "2026-10-20",
+    "es_estimado": false,
+    "es_supuesto": true,
+    "supuesto_auditoria": {
+      "condicion": "Aplica tasa 0% de IVA bajo el supuesto de que el producto importado califique como medicina de patente (especialidad farmacéutica terminada y dosificada con Registro Sanitario vigente otorgado por COFEPRIS conforme al Art. 7 RLIVA).",
+      "riesgo_si_no_cumple": "Si la mercancía fuese principio activo a granel no dosificado o insumo químico sin acreditar el supuesto de medicina de patente, la autoridad aduanera podría determinar la tasa general del 16% de IVA."
+    }
+  },
+  "prevalidacion": {
+    "concepto": "Prevalidación electrónica de datos de pedimento",
+    "clave": "PRV",
+    "moneda": "MXN",
+    "tipo": "rango_estimado",
+    "es_estimado": true,
+    "rango": {
+      "min": 310.0,
+      "max": 350.0
+    },
+    "unidad": "por_pedimento",
+    "descripcion": "Cuota por la prevalidación electrónica de datos que efectúan las personas autorizadas (incluye aprovechamiento de $330.00 M.N. e IVA o cuota reglamentaria vigente)",
+    "fundamento_legal": "Artículo 16-A de la Ley Aduanera y Regla 1.8.3 de las Reglas Generales de Comercio Exterior (RGCE)",
+    "fuente": "Reglas Generales de Comercio Exterior (RGCE / DOF) y Boletines Técnicos ANAM",
+    "fecha_consulta": "2026-10-20"
+  },
+  "honorarios_agente_aduanal": {
+    "concepto": "Honorarios y servicios complementarios de Agente Aduanal",
+    "clave": "HON",
+    "moneda": "MXN",
+    "tipo": "rango_estimado",
+    "es_estimado": true,
+    "porcentaje_valor_aduana": {
+      "min_pct": 0.45,
+      "max_pct": 0.80
+    },
+    "cuota_minima_piso_mxn": {
+      "min": 3500.0,
+      "max": 6500.0
+    },
+    "descripcion": "Honorarios profesionales por gestión aduanal, revisión de pedimento, validación de permisos sanitarios y maniobras de despacho para insumos médicos y cadena de frío",
+    "fundamento_legal": "Artículos 159, 160 y 169 de la Ley Aduanera (Régimen de libre contratación comercial)",
+    "fuente": "Tarifas de mercado y tabuladores de referencia CAAAREM / CLAA para aduanas aeroportuarias (MEX / GDL)",
+    "fecha_consulta": "2026-10-20"
+  }
+}

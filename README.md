@@ -14,6 +14,16 @@
 
 <br />
 
+<p align="center">
+  <strong>
+    <a href="docs/documento-tecnico.md">Documento técnico</a> ·
+    <a href="docs/guion-video.md">Guion del video</a> ·
+    <a href="docs/verificacion-datos.md">Verificación de fuentes</a>
+  </strong>
+</p>
+
+<br />
+
 <details>
   <summary>📋 Tabla de contenidos</summary>
   <ol>
@@ -27,6 +37,7 @@
     <li><a href="#pruebas">Pruebas</a></li>
     <li><a href="#límites-conocidos">Límites conocidos</a></li>
     <li><a href="#hoja-de-ruta">Hoja de ruta</a></li>
+    <li><a href="#documentación">Documentación</a></li>
     <li><a href="#el-equipo">El equipo</a></li>
   </ol>
 </details>
@@ -223,22 +234,26 @@ reintroduciría justo el error que se evitó.
 La parte más delicada del proyecto, y la que más trabajo humano necesita. Está
 documentada en [`data/LEEME.md`](data/LEEME.md).
 
-Cada dato lleva un estado:
+Cada cifra lleva un estado, y la diferencia entre los dos primeros es la razón
+de ser del proyecto:
 
 | Estado | Qué significa |
 |---|---|
-| `verificado` | Se leyó en la fuente oficial, en la fecha indicada. |
-| `estimado` | Rango real de mercado, no un dato oficial. |
-| `ejemplo_sin_verificar` | Relleno para poder programar. **No sirve para cotizar.** |
+| `verificado` | Una persona abrió la fuente y lo declaró con `"estado": "verificado"`. |
+| `con_fuente` | Trae cita y fecha, pero nadie ha confirmado que la cita diga eso. |
+| `estimado` | Rango real de mercado, no un dato oficial. Honorarios y prevalidación. |
+| `ejemplo_sin_verificar` | Sin valor en el catálogo. **No sirve para cotizar.** |
 
-Los archivos `*.ejemplo.json` que vienen en el repositorio están todos en
-`ejemplo_sin_verificar`. Existen para que la interfaz y el agente se pudieran
-construir sin esperar a los datos reales. Con ellos el sistema corre completo,
-pero devuelve ceros y marca la cotización en rojo, que es exactamente lo que
-debe hacer.
+Escribir "Ley Federal de Derechos, artículo 49" es gratis: cualquiera puede
+hacerlo sin haber abierto esa ley. Por eso **`verificado` no se deduce, se
+declara**. El motor nunca lo pone solo, y mientras falte esa declaración la
+pantalla dice "con fuente, sin comprobar" en ámbar y la cotización no llega a
+confianza alta.
 
-Las fuentes que hay que consultar están en
-[`docs/verificacion-datos.md`](docs/verificacion-datos.md).
+**Estado hoy:** el catálogo tiene 56 fracciones del capítulo 30 y los
+parámetros legales están cargados, todos en `con_fuente`. Falta que una persona
+los coteje contra el DOF y los declare verificados. Lo que hay que revisar está
+en [`docs/verificacion-datos.md`](docs/verificacion-datos.md).
 
 <p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
 
@@ -268,9 +283,15 @@ pruebas se saltan solas.
 
 Vale más decirlos que descubrirlos en una demostración.
 
-- **Los datos arancelarios todavía no están verificados.** Mientras no lo
-  estén, el sistema cotiza en ceros y lo advierte. Es su comportamiento
-  correcto, no una falla.
+- **Las tasas citan su fuente pero nadie las ha comprobado.** La pantalla lo
+  dice en ámbar, renglón por renglón. Es su comportamiento correcto, no una
+  falla, y cambia solo cuando una persona declare cada dato como verificado.
+- **Dos dudas abiertas sobre las cifras actuales.** El catálogo de aranceles
+  se armó sobre la LIGIE publicada en 2022 y hubo reformas arancelarias para
+  2026 que hay que descartar para el capítulo 30. Y el DTA se aplica al 8 al
+  millar en todos los casos, cuando el artículo 49 de la Ley Federal de
+  Derechos prevé cuotas fijas en otras fracciones: falta confirmar cuál toca
+  cuando el arancel es cero.
 - **No sustituye a un agente aduanal.** La clasificación arancelaria
   definitiva y el despacho los hace una persona con patente. Esto le ahorra
   los primeros días.
@@ -290,13 +311,27 @@ Vale más decirlos que descubrirlos en una demostración.
 
 ## 🗺️ Hoja de ruta
 
-- [ ] Verificar las fuentes oficiales y llenar `data/` con tasas reales
-- [ ] Los cinco casos calculados a mano
-- [ ] Catálogo completo del capítulo 30
+- [x] Catálogo de 56 fracciones del capítulo 30, con fuente y fecha
+- [x] Parámetros legales cargados: DTA, IVA, prevalidación y honorarios
+- [x] Cinco casos de prueba con los totales calculados fuera del motor
+- [ ] Cotejar cada tasa contra el DOF y declararla `verificado`
+- [ ] Resolver las dos dudas abiertas: reformas 2026 a la LIGIE y cuota del DTA
+- [ ] Catálogo completo del capítulo 30 (van 56 de unas 195)
 - [ ] Medir el costo por tarea del agente con el modelo real
 - [ ] Consultar si un medicamento ya tiene registro sanitario en México
 - [ ] Tasas preferenciales por tratado comercial
 - [ ] Guardar cotizaciones para comparar entre proveedores
+
+<p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
+
+## 📑 Documentación
+
+| Documento | Qué contiene |
+|---|---|
+| [Documento técnico](docs/documento-tecnico.md) | Arquitectura, decisiones de diseño, la fórmula y el estado al cierre del sprint |
+| [Guion del video](docs/guion-video.md) | Qué mostrar y qué decir en la demostración |
+| [Verificación de fuentes](docs/verificacion-datos.md) | De dónde salió cada cifra y qué falta comprobar |
+| [Los datos](data/LEEME.md) | Formato de los catálogos y la regla de los estados |
 
 <p align="right">(<a href="#readme-top">volver al inicio</a>)</p>
 

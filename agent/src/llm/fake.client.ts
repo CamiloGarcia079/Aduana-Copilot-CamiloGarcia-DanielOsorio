@@ -42,12 +42,15 @@ export class FakeLlmClient implements LlmClient {
           {
             id: 'falso-2',
             name: 'calcular_cotizacion',
+            // La fraccion existe en el catalogo a proposito: asi el ensayo sin
+            // red recorre el mismo camino que una cotizacion de verdad, con
+            // sus tasas y sus fuentes, en lugar de chocar con un hueco.
             rawArguments: JSON.stringify({
-              fraccion: '3004.31.01',
-              valor_mercancia_usd: 50000,
-              flete_usd: 3000,
-              seguro_usd: 400,
-              tipo_de_cambio: 17.5,
+              fraccion: '3004.31.02.01',
+              valor_mercancia_usd: 25000,
+              flete_usd: 1200,
+              seguro_usd: 300,
+              tipo_de_cambio: 20,
               origen: 'Alemania',
               destino: 'Guadalajara, Jalisco',
               es_medicina_de_patente: true,

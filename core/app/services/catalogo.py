@@ -65,13 +65,72 @@ def parametros() -> dict[str, Any]:
     return _cargar("parametros")
 
 
+def _primero(origen: dict[str, Any], *nombres: str) -> Any:
+    """
+    Devuelve el primer campo que exista y traiga algo.
+
+    Los archivos de datos se han escrito en dos momentos y con dos
+    vocabularios: unos usan `clave` y `quien_lo_emite`, otros `id` y `emisor`.
+    En lugar de obligar a reescribir los datos, que es donde esta el trabajo
+    de verificacion mas caro, el motor acepta los dos y los traduce aqui.
+    """
+    for nombre in nombres:
+        valor = origen.get(nombre)
+        if valor not in (None, ""):
+            return valor
+    return None
+
+
+def _normalizar_documento(d: dict[str, Any]) -> dict[str, Any]:
+    """Lleva un documento a los nombres de campo que espera el contrato."""
+    return {
+        "clave": _primero(d, "clave", "id") or "",
+        "nombre": _primero(d, "nombre") or "",
+        "quien_lo_emite": _primero(d, "quien_lo_emite", "emisor") or "",
+        "obligatorio": bool(d.get("obligatorio")),
+        "notas": _primero(d, "notas", "descripcion"),
+        "estado": d.get("estado"),
+        "fuente": _primero(d, "fuente", "fundamento_legal") or "",
+    }
+
+
 @lru_cache(maxsize=1)
 def documentos() -> list[dict[str, Any]]:
     """Permisos y documentos de una importacion de medicamentos."""
     datos = _cargar("documentos")
-    if isinstance(datos, list):
-        return datos
-    return datos.get("documentos", [])
+    crudos = datos if isinstance(datos, list) else datos.get("documentos", [])
+    return [_normalizar_documento(d) for d in crudos]
+
+
+def rango_de(clave: str) -> dict[str, Any]:
+    """
+    Lee un costo que se reporta como rango y no entra al total.
+
+    Hay tres formas de escribirlo en los datos, y las tres significan lo
+    mismo: `monto_min_mxn` y `monto_max_mxn` sueltos, un objeto `rango` con
+    `min` y `max`, o una `cuota_minima_piso_mxn` igual con `min` y `max`.
+    Se leen las tres para que un costo escrito de cualquiera de esas maneras
+    aparezca en la cotizacion en lugar de salir como "por cotizar".
+    """
+    origen = parametros().get(clave, {})
+
+    minimo = _primero(origen, "monto_min_mxn")
+    maximo = _primero(origen, "monto_max_mxn")
+
+    if minimo is None and maximo is None:
+        anidado = origen.get("rango") or origen.get("cuota_minima_piso_mxn") or {}
+        minimo = _primero(anidado, "min", "monto_min_mxn")
+        maximo = _primero(anidado, "max", "monto_max_mxn")
+
+    return {
+        "concepto": origen.get("concepto"),
+        "monto_min_mxn": minimo,
+        "monto_max_mxn": maximo,
+        "estado": origen.get("estado"),
+        "es_estimado": origen.get("es_estimado"),
+        "fuente": _primero(origen, "fuente", "fundamento_legal") or "",
+        "fecha_consulta": origen.get("fecha_consulta") or "",
+    }
 
 
 def buscar_fraccion(codigo: str) -> Optional[dict[str, Any]]:

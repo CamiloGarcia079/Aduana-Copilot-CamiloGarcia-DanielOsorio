@@ -26,16 +26,28 @@ from pydantic import BaseModel, Field
 
 
 class EstadoDato(str, Enum):
-    """Que tanto se puede confiar en una cifra."""
+    """
+    Que tanto se puede confiar en una cifra.
+
+    La diferencia entre `CON_FUENTE` y `VERIFICADO` es la razon de ser de este
+    proyecto. Que un dato traiga una cita no quiere decir que alguien la haya
+    abierto: una herramienta puede escribir "Ley Federal de Derechos, articulo
+    49" sin haber leido nunca esa ley. Por eso `VERIFICADO` no se deduce, se
+    declara: solo lo pone una persona que fue a la fuente, y hasta entonces la
+    cifra se presenta como lo que es, una cita sin comprobar.
+    """
 
     VERIFICADO = "verificado"
-    """Se leyo en la fuente oficial, en la fecha indicada."""
+    """Una persona lo leyo en la fuente oficial, en la fecha indicada."""
+
+    CON_FUENTE = "con_fuente"
+    """Trae cita y fecha, pero nadie ha confirmado que la cita diga eso."""
 
     ESTIMADO = "estimado"
     """Es un rango real de mercado, no un dato oficial."""
 
     EJEMPLO_SIN_VERIFICAR = "ejemplo_sin_verificar"
-    """Dato de relleno para poder programar. No sirve para cotizar."""
+    """Sin valor utilizable. No sirve para cotizar."""
 
 
 class Concepto(BaseModel):

@@ -88,51 +88,91 @@ body {
   min-height: 100vh;
 }
 
+/*
+ * El encabezado.
+ *
+ * Centrado y corto. La tentacion con un encabezado centrado es agrandarlo,
+ * pero esto es una herramienta de trabajo: cada pixel de aqui empuja hacia
+ * abajo el formulario, que es donde la persona empieza. Por eso el sello mide
+ * 34 px y no 80, y el conjunto no pasa de unos 120 px de alto.
+ */
 .cinta {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  padding: 14px 24px;
+  gap: 6px;
+  padding: 18px 24px 16px;
   background: var(--papel);
   border-bottom: 1px solid var(--filete);
+  text-align: center;
 }
 
-.cinta__nombre {
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.marca__sello {
+  display: flex;
+  color: var(--sello);
+}
+
+.marca__nombre {
   margin: 0;
   font-family: var(--serif);
-  font-size: var(--t-alto);
+  font-size: var(--t-titulo);
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
-.cinta__que-es {
+.marca__que-es {
   margin: 0;
   color: var(--tinta-suave);
-  font-size: var(--t-nota);
-  max-width: 34ch;
+  font-size: var(--t-base);
+  /* Ancho suficiente para que la frase quepa en un renglon y no deje una
+     palabra sola colgando debajo. */
+  max-width: 68ch;
+  text-wrap: balance;
 }
 
 /*
  * La insignia de vigencia de los datos.
  *
- * Va arriba y siempre visible porque es el dato que decide si la cotizacion
- * sirve. Una cotizacion con aranceles de hace dos anos no es una cotizacion.
+ * Va bajo el nombre y siempre visible porque es el dato que decide si la
+ * cotizacion sirve. Tiene tres estados y no dos: una cifra que falta y una
+ * cifra citada que nadie comprobo son problemas distintos, y el usuario
+ * necesita saber cual tiene enfrente.
  */
 .vigencia {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-inline-start: auto;
-  padding: 6px 12px;
-  border: 1px solid var(--filete);
+  margin: 4px 0 0;
+  padding: 5px 12px;
+  border: 1px solid;
   border-radius: 2px;
-  background: var(--sello-claro);
   font-size: var(--t-nota);
+}
+
+.vigencia--alta {
+  background: var(--sello-claro);
+  border-color: color-mix(in srgb, var(--sello) 30%, transparent);
   color: var(--sello);
 }
 
-.vigencia--hueco {
+/*
+ * Ambar para "citado pero sin comprobar": no es un error, es trabajo a medias.
+ * Pintarlo de rojo haria que pareciera una falla, y pintarlo de verde seria
+ * exactamente la mentira que este proyecto evita.
+ */
+.vigencia--media {
+  background: #fdf6e8;
+  border-color: #d9b878;
+  color: #8a6212;
+}
+
+.vigencia--baja {
   background: var(--bandera-clara);
   border-color: color-mix(in srgb, var(--bandera) 28%, transparent);
   color: var(--bandera);
@@ -315,9 +355,8 @@ body {
 
 /* Ejemplos para cargar con un clic. */
 .ejemplos {
-  margin: 0 0 16px;
-  padding: 12px 0 0;
-  border-top: 1px solid var(--filete);
+  margin: 0 0 18px;
+  padding: 0;
 }
 
 .ejemplos__rotulo {
@@ -328,25 +367,172 @@ body {
 }
 
 .ejemplos__lista {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 6px;
 }
 
+/*
+ * Cada ejemplo dice que escenario carga, no solo su nombre.
+ *
+ * Puestos uno debajo de otro se lee la diferencia entre ellos, y con eso se
+ * entiende sin explicaciones que el resultado cambia segun el producto.
+ */
 .ejemplo {
-  padding: 5px 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 11px;
   border: 1px solid var(--filete-fuerte);
   border-radius: 2px;
   background: var(--papel);
   color: var(--tinta);
   font-family: var(--sans);
-  font-size: var(--t-nota);
+  font-size: var(--t-base);
+  text-align: start;
   cursor: pointer;
+  transition: border-color 0.15s ease;
 }
 
 .ejemplo:hover {
   border-color: var(--sello);
+}
+
+.ejemplo__nombre {
+  font-weight: 500;
+}
+
+.ejemplo__pista {
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+/* ---------- Buscador de medicamento ---------- */
+
+.candidatas {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--filete-fuerte);
+  border-radius: 2px;
+  overflow: hidden;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.candidatas li + li {
+  border-top: 1px solid var(--filete);
+}
+
+.candidatas button {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  border: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: var(--t-base);
+  text-align: start;
+  cursor: pointer;
+}
+
+.candidatas button:hover,
+.candidatas button:focus-visible {
+  background: var(--sello-claro);
+}
+
+.candidata__nombre {
+  display: block;
+  line-height: 1.35;
+}
+
+/* Lo que separa dos fracciones que se leen igual. */
+.candidata__forma {
+  display: block;
+  margin-top: 2px;
   color: var(--sello);
+  font-size: var(--t-nota);
+}
+
+.candidata__pie {
+  display: flex;
+  gap: 10px;
+  margin-top: 3px;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+/* La fraccion ya elegida, presentada como ficha y no como campo. */
+.elegida {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 1px solid var(--sello);
+  border-radius: 2px;
+  background: var(--sello-claro);
+}
+
+.elegida__texto {
+  min-width: 0;
+}
+
+.elegida__nombre {
+  margin: 0;
+  font-size: var(--t-base);
+  line-height: 1.35;
+}
+
+.elegida__codigo {
+  margin: 2px 0 0;
+  color: var(--sello);
+  font-size: var(--t-nota);
+}
+
+.elegida__cambiar {
+  margin-inline-start: auto;
+  flex: none;
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  color: var(--sello);
+  font-family: var(--sans);
+  font-size: var(--t-nota);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pista {
+  margin: 6px 0 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+.pista--hueco {
+  color: var(--bandera);
+}
+
+/* ---------- Grupo de campos ---------- */
+
+.grupo {
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+}
+
+.grupo__titulo {
+  padding: 0;
+  margin-bottom: 8px;
+  font-family: var(--serif);
+  font-size: var(--t-base);
+  font-weight: 600;
+}
+
+.campo__pista {
+  display: block;
+  margin-top: 3px;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
 }
 
 .aviso-error {
@@ -366,20 +552,77 @@ body {
 
 /* ---------- La hoja de liquidacion ---------- */
 
+/*
+ * La hoja es el unico elemento con sombra de toda la pantalla.
+ *
+ * Es deliberado: si todo flota, nada destaca. La sombra la separa del fondo y
+ * la hace leer como un papel sobre un escritorio, que es exactamente lo que
+ * queremos que sea. Es calida y no gris, porque una sombra gris sobre papel
+ * crudo se ve sucia.
+ */
 .hoja {
   background: var(--papel);
   border: 1px solid var(--filete-fuerte);
   border-radius: 3px;
   overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(60, 50, 30, 0.05),
+    0 8px 24px -12px rgba(60, 50, 30, 0.16);
+}
+
+/*
+ * El membrete.
+ *
+ * Una banda fina en verde de sello arriba de todo. Es lo que convierte la
+ * hoja en papel membretado y lo que hace que la cotizacion se reconozca
+ * cuando circule impresa, sin que tengamos que gritar la marca.
+ */
+.membrete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  background: var(--sello);
+  color: var(--papel);
+}
+
+.membrete__sello {
+  display: flex;
+  opacity: 0.9;
+}
+
+.membrete__nombre {
+  font-family: var(--serif);
+  font-size: var(--t-medio);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.membrete__folio {
+  margin-inline-start: auto;
+  font-size: var(--t-nota);
+  opacity: 0.82;
+}
+
+/* Una sola entrada, al llegar el resultado. Nada mas se mueve en la pantalla. */
+.resultado {
+  animation: llega 0.42s cubic-bezier(0.22, 0.68, 0.3, 1) both;
+}
+
+@keyframes llega {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 .hoja__encabezado {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  padding: 18px 20px 14px;
+  padding: 16px 20px 14px;
   border-bottom: 1px solid var(--filete);
 }
 
@@ -397,19 +640,87 @@ body {
   font-size: var(--t-nota);
 }
 
-.hoja__folio {
-  text-align: right;
+/* ---------- Estado inicial: la bienvenida ---------- */
+
+/*
+ * No es una caja vacia esperando: es la unica oportunidad de explicar el
+ * producto a alguien que todavia no sabe que hace. Por eso dice las tres
+ * cosas que entrega y, al final, la que no hace.
+ */
+.bienvenida {
+  padding: 40px 36px;
+  background: var(--papel);
+  border: 1px solid var(--filete);
+  border-radius: 3px;
 }
 
-.hoja__folio dt {
-  font-size: var(--t-nota);
+.bienvenida__sello {
+  display: flex;
+  color: var(--sello);
+  opacity: 0.9;
+}
+
+.bienvenida__titulo {
+  margin: 14px 0 8px;
+  font-family: var(--serif);
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  max-width: 24ch;
+  line-height: 1.22;
+}
+
+.bienvenida__entrada {
+  margin: 0 0 28px;
+  max-width: 58ch;
+  font-size: var(--t-medio);
   color: var(--tinta-suave);
 }
 
-.hoja__folio dd {
+.promesas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--filete);
+}
+
+.promesas li {
+  padding: 18px 20px 18px 0;
+  border-inline-end: 1px solid var(--filete);
+}
+
+.promesas li:last-child {
+  border-inline-end: none;
+  padding-inline-end: 0;
+}
+
+.promesas li + li {
+  padding-inline-start: 20px;
+}
+
+.promesas h3 {
+  margin: 0 0 5px;
+  font-family: var(--serif);
   font-size: var(--t-medio);
-  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.promesas p {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+.bienvenida__limite {
+  margin: 24px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--filete);
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+  max-width: 62ch;
 }
 
 /*
@@ -503,7 +814,22 @@ body {
 }
 
 .renglon__nombre {
+  display: block;
   font-size: var(--t-medio);
+}
+
+/*
+ * Lo que la sigla quiere decir, debajo de la sigla.
+ *
+ * Sin esta linea el documento solo lo entiende un agente aduanal, y quien lo
+ * necesita es justamente quien no lo es.
+ */
+.renglon__que-es {
+  display: block;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+  line-height: 1.35;
+  max-width: 34ch;
 }
 
 .renglon__monto {
@@ -537,6 +863,17 @@ body {
 
 .respaldo__marca {
   font-variant-numeric: tabular-nums;
+}
+
+/* Marca el renglon cuya cita nadie ha abierto todavia. */
+.respaldo__pendiente {
+  margin-inline-start: 2px;
+  padding: 1px 6px;
+  border: 1px solid #d9b878;
+  border-radius: 2px;
+  background: #fdf6e8;
+  color: #8a6212;
+  font-size: 11px;
 }
 
 /* Fila del valor en aduana: es la base, no un impuesto. */
@@ -582,9 +919,106 @@ body {
 }
 
 .total__nota {
+  display: block;
+  margin: 8px 0 0;
   font-size: var(--t-nota);
   color: var(--tinta-suave);
-  max-width: 48ch;
+  max-width: 62ch;
+}
+
+/* ---------- La cuenta, paso a paso ---------- */
+
+/*
+ * Va cerrada por omision. Quien confia sigue de largo; quien duda la abre.
+ * Lo que importa es que comprobar el total este a un clic y no haya que
+ * pedirlo.
+ */
+.cuenta {
+  margin-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--sello) 18%, transparent);
+  padding-top: 10px;
+}
+
+.cuenta__abrir {
+  cursor: pointer;
+  color: var(--sello);
+  font-size: var(--t-nota);
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cuenta__abrir::-webkit-details-marker {
+  display: none;
+}
+
+/* Un triangulo que gira al abrir: dice que hay algo plegado sin usar texto. */
+.cuenta__abrir::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-inline-start: 5px solid currentColor;
+  border-block: 4px solid transparent;
+  transition: transform 0.18s ease;
+}
+
+.cuenta[open] .cuenta__abrir::before {
+  transform: rotate(90deg);
+}
+
+.cuenta__pasos {
+  margin: 12px 0 2px;
+  padding: 0;
+  list-style: none;
+  counter-reset: paso;
+}
+
+.cuenta__pasos > li {
+  position: relative;
+  padding: 0 0 12px 26px;
+  counter-increment: paso;
+}
+
+/*
+ * Los pasos van numerados porque esto SI es una secuencia: cada renglon usa
+ * el resultado del anterior, y ese encadenamiento es justo lo que se quiere
+ * mostrar.
+ */
+.cuenta__pasos > li::before {
+  content: counter(paso);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 1px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--sello-claro);
+  color: var(--sello);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  place-items: center;
+}
+
+.cuenta__que {
+  margin: 0;
+  font-size: var(--t-base);
+}
+
+.cuenta__operacion {
+  margin: 1px 0 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+}
+
+.cuenta__resultado {
+  margin: 2px 0 0;
+  font-size: var(--t-base);
+}
+
+.cuenta__cierre .cuenta__resultado {
+  font-weight: 600;
 }
 
 .total__monto {
@@ -610,7 +1044,11 @@ body {
   background: var(--sello-claro);
 }
 
-.sello--media,
+.sello--media {
+  color: #8a6212;
+  background: #fdf6e8;
+}
+
 .sello--baja {
   color: var(--bandera);
   background: var(--bandera-clara);
@@ -643,11 +1081,26 @@ body {
 
 /* ---------- Bloques de abajo ---------- */
 
+/*
+ * Los paneles de abajo.
+ *
+ * `align-items: start` evita que un panel corto se estire para igualar al
+ * largo: sin eso, el de supuestos queda como una caja casi vacia al lado de
+ * la lista de documentos, y el hueco se lee como si faltara algo.
+ */
 .pliegos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
   gap: 24px;
   margin-top: 24px;
+}
+
+/* Cada columna apila sus paneles con el mismo aire que los separa entre si. */
+.columna {
+  display: grid;
+  align-content: start;
+  gap: 24px;
 }
 
 .pliego {
@@ -753,15 +1206,57 @@ body {
   flex: none;
 }
 
+.papel__texto {
+  min-width: 0;
+}
+
 .papel__nombre {
   margin: 0;
   font-size: var(--t-base);
+  line-height: 1.35;
 }
 
 .papel__quien {
-  margin: 0;
+  margin: 1px 0 0;
   color: var(--tinta-suave);
   font-size: var(--t-nota);
+}
+
+/*
+ * La explicacion larga, recortada a dos renglones.
+ *
+ * Esta lista se usa para ir tachando requisitos, y once fichas de seis
+ * renglones no se recorren con la vista. El texto completo sigue ahi, a un
+ * clic del boton que despliega los once a la vez.
+ */
+.papel__nota {
+  margin: 4px 0 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-nota);
+  line-height: 1.45;
+}
+
+.papel__nota--corta {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pliego__alterna {
+  margin: 0 18px 10px;
+  padding: 4px 9px;
+  border: 1px solid var(--filete-fuerte);
+  border-radius: 2px;
+  background: var(--papel);
+  color: var(--sello);
+  font-family: var(--sans);
+  font-size: var(--t-nota);
+  cursor: pointer;
+}
+
+.pliego__alterna:hover {
+  border-color: var(--sello);
 }
 
 .papel__opcional {
@@ -827,29 +1322,6 @@ body {
   font-size: var(--t-nota);
 }
 
-/* ---------- Estado vacio ---------- */
-
-.en-blanco {
-  padding: 56px 28px;
-  text-align: center;
-  background: var(--papel);
-  border: 1px dashed var(--filete-fuerte);
-  border-radius: 3px;
-}
-
-.en-blanco__titulo {
-  margin: 0 0 8px;
-  font-family: var(--serif);
-  font-size: var(--t-alto);
-  font-weight: 600;
-}
-
-.en-blanco p {
-  margin: 0 auto;
-  max-width: 48ch;
-  color: var(--tinta-suave);
-}
-
 /* ---------- Acciones de la hoja ---------- */
 
 .acciones {
@@ -887,11 +1359,30 @@ body {
     background: #fff;
   }
 
-  .cinta,
   .peticion,
   .acciones,
   .tramo {
     display: none;
+  }
+
+  /*
+   * El encabezado si se imprime, al reves que el resto del cascaron.
+   *
+   * El PDF es lo que el cliente se lleva y reenvia. Sin el sello y sin la
+   * insignia de vigencia, esa hoja circularia sin decir de donde salio ni
+   * que tan comprobada esta, que es justo lo que no queremos.
+   */
+  .cinta {
+    padding: 0 0 14px;
+    border-bottom: 1px solid #999;
+    margin-bottom: 16px;
+    break-after: avoid;
+  }
+
+  .vigencia {
+    border-color: #999;
+    color: #000;
+    background: none;
   }
 
   .taller {
@@ -906,11 +1397,47 @@ body {
     break-inside: avoid;
   }
 
-  .pliegos {
+  .pliegos,
+  .columna {
     display: block;
   }
 
   .pliego {
     margin-top: 16px;
+  }
+
+  /* El membrete lleva color de fondo: hay que pedir que se imprima. */
+  .membrete {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /*
+   * La cuenta paso a paso se imprime abierta, aunque en pantalla este
+   * plegada. En papel no hay donde hacer clic, y es justo lo que alguien va a
+   * querer revisar cuando lea la cotizacion fuera de la computadora.
+   */
+  .cuenta[open] .cuenta__pasos,
+  .cuenta .cuenta__pasos {
+    display: block;
+  }
+
+  .cuenta__abrir {
+    display: none;
+  }
+
+  /* En papel se imprimen las descripciones completas, no recortadas. */
+  .papel__nota--corta {
+    display: block;
+    overflow: visible;
+  }
+
+  .pliego__alterna,
+  .resultado {
+    animation: none;
+  }
+
+  .pliego__alterna {
+    display: none;
   }
 }

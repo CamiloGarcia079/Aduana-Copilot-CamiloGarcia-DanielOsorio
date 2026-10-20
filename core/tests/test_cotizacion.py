@@ -46,6 +46,7 @@ def datos_de_prueba(monkeypatch):
             "fraccion": "9999.99.99",
             "descripcion": "Mercancia de prueba",
             "igi_pct": 10,
+            "estado": "verificado",
             "fuente": "prueba",
             "fecha_consulta": "2026-10-20",
         }
@@ -56,18 +57,44 @@ def datos_de_prueba(monkeypatch):
         catalogo,
         "parametros",
         lambda: {
-            "dta": {"tasa_pct": 1, "fuente": "prueba", "fecha_consulta": "2026-10-20"},
-            "iva": {
-                "tasa_general_pct": 16,
-                "tasa_medicina_de_patente_pct": 0,
+            "dta": {
+                "tasa_pct": 1,
+                "estado": "verificado",
                 "fuente": "prueba",
                 "fecha_consulta": "2026-10-20",
             },
-            "prevalidacion": {"estado": "estimado", "monto_min_mxn": 300, "monto_max_mxn": 400},
-            "honorarios_agente_aduanal": {"estado": "estimado", "pct_min": 0.3, "pct_max": 0.8},
+            "iva": {
+                "tasa_general_pct": 16,
+                "tasa_medicina_de_patente_pct": 0,
+                "estado": "verificado",
+                "fuente": "prueba",
+                "fecha_consulta": "2026-10-20",
+            },
+            "prevalidacion": {"monto_min_mxn": 300, "monto_max_mxn": 400},
+            "honorarios_agente_aduanal": {"monto_min_mxn": 5000, "monto_max_mxn": 9000},
         },
     )
     monkeypatch.setattr(catalogo, "documentos", lambda: [])
+    monkeypatch.setattr(
+        catalogo,
+        "rango_de",
+        lambda clave: {
+            "prevalidacion": {
+                "concepto": "Prevalidacion",
+                "monto_min_mxn": 300,
+                "monto_max_mxn": 400,
+                "fuente": "prueba",
+                "fecha_consulta": "2026-10-20",
+            },
+            "honorarios_agente_aduanal": {
+                "concepto": "Honorarios",
+                "monto_min_mxn": 5000,
+                "monto_max_mxn": 9000,
+                "fuente": "prueba",
+                "fecha_consulta": "2026-10-20",
+            },
+        }[clave],
+    )
 
 
 def _peticion(**cambios) -> CotizacionRequest:
@@ -171,10 +198,60 @@ def test_fraccion_desconocida_no_revienta_y_baja_la_confianza(datos_de_prueba):
 
 
 def test_con_todos_los_datos_verificados_la_confianza_es_alta(datos_de_prueba):
+    """La confianza alta exige que los tres datos se declaren verificados."""
     r = cotizacion.cotizar(_peticion())
 
     assert r.confianza is Confianza.ALTA
     assert r.advertencia is None
+
+
+def test_una_tasa_con_fuente_pero_sin_declarar_no_da_confianza_alta(
+    datos_de_prueba, monkeypatch
+):
+    """
+    La regla que sostiene la honestidad del proyecto.
+
+    Una tasa puede traer el nombre de una ley y una fecha y aun asi no haber
+    sido comprobada por nadie: escribir "Ley Federal de Derechos" es gratis.
+    Mientras el dato no diga `estado: verificado`, la cotizacion no puede
+    presumir el sello verde, por mas completa que se vea.
+    """
+    monkeypatch.setattr(
+        catalogo,
+        "buscar_fraccion",
+        lambda codigo: {
+            "fraccion": "9999.99.99",
+            "descripcion": "Mercancia de prueba",
+            "igi_pct": 10,
+            # Trae cita y fecha, pero nadie declaro haberla comprobado.
+            "fuente": "Una ley que suena muy oficial",
+            "fecha_consulta": "2026-10-20",
+        },
+    )
+
+    r = cotizacion.cotizar(_peticion())
+
+    assert r.igi.estado is EstadoDato.CON_FUENTE
+    assert r.confianza is Confianza.MEDIA
+    assert r.advertencia is not None
+    assert "nadie las ha comprobado" in r.advertencia
+
+
+def test_una_tasa_que_falta_pesa_mas_que_una_sin_comprobar(datos_de_prueba, monkeypatch):
+    """
+    Un hueco deja la cotizacion en confianza baja, no en media.
+
+    Se distinguen porque son problemas distintos: una cifra que falta se ve
+    como cero y mueve el total, mientras una citada sin comprobar al menos
+    tiene un numero plausible detras.
+    """
+    monkeypatch.setattr(catalogo, "buscar_fraccion", lambda codigo: None)
+
+    r = cotizacion.cotizar(_peticion())
+
+    assert r.igi.estado is EstadoDato.EJEMPLO_SIN_VERIFICAR
+    assert r.confianza is Confianza.BAJA
+    assert "sin valor en el catálogo" in r.advertencia
 
 
 def test_los_rangos_no_entran_al_total(datos_de_prueba):

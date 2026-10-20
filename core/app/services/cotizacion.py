@@ -40,9 +40,15 @@ CENTAVOS = Decimal("0.01")
 
 SIN_DATO = "dato no verificado todavía"
 
-ADVERTENCIA_NO_FIRME = (
-    "Esta cotización tiene cifras sin verificar en fuente oficial. "
+ADVERTENCIA_SIN_DATOS = (
+    "Esta cotización tiene cifras sin valor en el catálogo. "
     "Valídala con tu agente aduanal antes de tomar una decisión de compra."
+)
+
+ADVERTENCIA_SIN_COMPROBAR = (
+    "Las tasas de esta cotización citan su fuente, pero todavía nadie las ha "
+    "comprobado contra el texto oficial. Valídala con tu agente aduanal antes "
+    "de tomar una decisión de compra."
 )
 
 
@@ -57,9 +63,32 @@ def _redondear(monto: Decimal) -> Decimal:
     return monto.quantize(CENTAVOS, rounding=ROUND_HALF_UP)
 
 
-def _estado(valor: Any) -> EstadoDato:
-    """Un dato sin valor no esta verificado, por mas que lo diga su campo."""
-    return EstadoDato.EJEMPLO_SIN_VERIFICAR if valor is None else EstadoDato.VERIFICADO
+def _estado(valor: Any, origen: dict[str, Any]) -> EstadoDato:
+    """
+    Decide cuanto vale una cifra.
+
+    El orden importa y es deliberado:
+
+    1. Sin valor, no hay nada que creer.
+    2. Con valor, solo es `verificado` si el dato lo dice con todas sus letras
+       (`"estado": "verificado"`). Eso lo escribe una persona que abrio la
+       fuente, nunca el motor.
+    3. Con valor y una cita, pero sin esa declaracion, queda `con_fuente`.
+
+    La version anterior daba por verificado cualquier numero que viniera
+    acompanado de un texto de fuente. Era comodo y era falso: bastaba con que
+    una herramienta escribiera el nombre de una ley para que la pantalla
+    mostrara el sello verde. Esa comodidad es justo lo que este proyecto dice
+    no hacer.
+    """
+    if valor is None:
+        return EstadoDato.EJEMPLO_SIN_VERIFICAR
+
+    declarado = str(origen.get("estado") or "").strip().lower()
+    if declarado == EstadoDato.VERIFICADO.value:
+        return EstadoDato.VERIFICADO
+
+    return EstadoDato.CON_FUENTE
 
 
 def _a_decimal(valor: Any) -> Optional[Decimal]:
@@ -87,7 +116,7 @@ def _concepto(
         base_mxn=_redondear(base),
         tasa_pct=tasa,
         monto_mxn=monto,
-        estado=_estado(tasa_pct),
+        estado=_estado(tasa_pct, origen),
         fuente=origen.get("fuente") or SIN_DATO,
         fecha_consulta=origen.get("fecha_consulta") or "",
         vigencia=origen.get("vigencia"),
@@ -170,7 +199,11 @@ def cotizar(peticion: CotizacionRequest) -> CotizacionResponse:
                 clave="dta_sin_verificar",
                 descripcion="La tasa del Derecho de Trámite Aduanero no está verificada.",
                 por_que="Se tomó cero para poder calcular.",
-                como_verificar="Lee el artículo 179 de la Ley Federal de Derechos vigente.",
+                como_verificar=(
+                    "Lee el artículo 49 de la Ley Federal de Derechos vigente. "
+                    "La fracción I fija el 8 al millar; revisa si a esta mercancía "
+                    "le toca una cuota fija de otra fracción."
+                ),
                 afecta_al_total=True,
             )
         )
@@ -220,19 +253,24 @@ def cotizar(peticion: CotizacionRequest) -> CotizacionResponse:
 
     # ---- Costos que van aparte porque son rangos ----
     no_incluidos = [
-        _rango(params.get("prevalidacion", {}), "Prevalidación del pedimento"),
-        _rango(params.get("honorarios_agente_aduanal", {}), "Honorarios del agente aduanal"),
+        _rango(catalogo.rango_de("prevalidacion"), "Prevalidación del pedimento"),
+        _rango(
+            catalogo.rango_de("honorarios_agente_aduanal"),
+            "Honorarios del agente aduanal",
+        ),
     ]
 
     # ---- Documentos ----
     docs = [
         Documento(
-            clave=d.get("clave", ""),
+            # Si el dato no trae clave, se usa el nombre: la pantalla necesita
+            # un identificador distinto por documento para poder listarlos.
+            clave=d.get("clave") or d.get("nombre", ""),
             nombre=d.get("nombre", ""),
             quien_lo_emite=d.get("quien_lo_emite", ""),
             obligatorio=bool(d.get("obligatorio")),
             notas=d.get("notas"),
-            estado=EstadoDato(d.get("estado", EstadoDato.EJEMPLO_SIN_VERIFICAR.value)),
+            estado=_estado(d.get("nombre"), d),
             fuente=d.get("fuente") or SIN_DATO,
         )
         for d in catalogo.documentos()
@@ -256,17 +294,44 @@ def cotizar(peticion: CotizacionRequest) -> CotizacionResponse:
         supuestos=supuestos,
         documentos=docs,
         confianza=confianza,
-        advertencia=None if confianza is Confianza.ALTA else ADVERTENCIA_NO_FIRME,
+        advertencia=_advertencia(confianza),
     )
 
 
+def _advertencia(confianza: Confianza) -> Optional[str]:
+    """
+    El aviso que corresponde a cada nivel de confianza.
+
+    Son dos textos distintos porque los problemas son distintos: una cifra que
+    falta no es lo mismo que una cifra citada que nadie abrio. Decirle al
+    usuario cual de las dos cosas le pasa es lo que le permite decidir si
+    puede seguir o tiene que llamar a su agente.
+    """
+    if confianza is Confianza.ALTA:
+        return None
+    if confianza is Confianza.BAJA:
+        return ADVERTENCIA_SIN_DATOS
+    return ADVERTENCIA_SIN_COMPROBAR
+
+
 def _rango(origen: dict[str, Any], nombre: str) -> Rango:
-    """Arma un costo que se reporta como rango y no entra al total."""
+    """
+    Arma un costo que se reporta como rango y no entra al total.
+
+    Un rango de mercado nunca llega a `verificado`, por mas que traiga fuente:
+    los honorarios se negocian y la prevalidacion cambia por aduana, asi que
+    lo mas honesto que puede ser es `estimado`.
+    """
+    minimo = _a_decimal(origen.get("monto_min_mxn"))
+    maximo = _a_decimal(origen.get("monto_max_mxn"))
+
+    tiene_rango = minimo is not None or maximo is not None
+
     return Rango(
         concepto=origen.get("concepto") or nombre,
-        monto_min_mxn=_a_decimal(origen.get("monto_min_mxn")),
-        monto_max_mxn=_a_decimal(origen.get("monto_max_mxn")),
-        estado=EstadoDato(origen.get("estado", EstadoDato.EJEMPLO_SIN_VERIFICAR.value)),
+        monto_min_mxn=minimo,
+        monto_max_mxn=maximo,
+        estado=EstadoDato.ESTIMADO if tiene_rango else EstadoDato.EJEMPLO_SIN_VERIFICAR,
         fuente=origen.get("fuente") or SIN_DATO,
         fecha_consulta=origen.get("fecha_consulta") or "",
     )
@@ -276,18 +341,21 @@ def _calcular_confianza(*conceptos: Concepto) -> Confianza:
     """
     Resume que tan firme es la cotizacion en una sola palabra.
 
-    Se mira cuantos conceptos quedaron sin verificar. Basta uno para que la
-    cotizacion deje de ser firme, porque ese hueco ya mueve el total.
-    """
-    sin_verificar = sum(
-        1 for c in conceptos if c.estado is EstadoDato.EJEMPLO_SIN_VERIFICAR
-    )
+    `alta` exige que las tres cifras esten declaradas como verificadas por una
+    persona. Una sola cita sin comprobar basta para bajar a `media`, y un
+    hueco sin valor la deja en `baja`.
 
-    if sin_verificar == 0:
+    Es un criterio severo a proposito. La pantalla pinta la confianza alta en
+    verde y el jurado la va a leer como una promesa, asi que esa promesa solo
+    se hace cuando alguien la respalda con su nombre.
+    """
+    if any(c.estado is EstadoDato.EJEMPLO_SIN_VERIFICAR for c in conceptos):
+        return Confianza.BAJA
+
+    if all(c.estado is EstadoDato.VERIFICADO for c in conceptos):
         return Confianza.ALTA
-    if sin_verificar == 1:
-        return Confianza.MEDIA
-    return Confianza.BAJA
+
+    return Confianza.MEDIA
 
 
 def buscar_fracciones(consulta: str) -> BusquedaFraccionResponse:

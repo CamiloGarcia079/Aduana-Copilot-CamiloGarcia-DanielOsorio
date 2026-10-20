@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { cotizar, ErrorDeCotizacion } from './lib/api';
+import { Bienvenida } from './components/Bienvenida';
+import { Encabezado } from './components/Encabezado';
 import { FormularioCotizacion } from './components/FormularioCotizacion';
 import { HojaDeLiquidacion } from './components/HojaDeLiquidacion';
 import { Supuestos } from './components/Supuestos';
 import { Documentos } from './components/Documentos';
+import { CostosAparte } from './components/CostosAparte';
 import { TramoDeEnvio } from './components/TramoDeEnvio';
 import type { Cotizacion, PeticionCotizacion } from './lib/types';
 
@@ -14,15 +17,27 @@ interface Falla {
 
 export default function App() {
   const [cotizacion, setCotizacion] = useState<Cotizacion | null>(null);
+
+  /**
+   * Lo último que se pidió.
+   *
+   * Se guarda porque la cotización que vuelve del motor trae los pesos pero no
+   * los dólares que se escribieron, y la explicación del cálculo necesita esos
+   * dólares para poder empezar la cuenta por el principio.
+   */
+  const [peticion, setPeticion] = useState<PeticionCotizacion | null>(null);
+
   const [cotizando, setCotizando] = useState(false);
   const [falla, setFalla] = useState<Falla | null>(null);
 
-  async function pedirCotizacion(peticion: PeticionCotizacion) {
+  async function pedirCotizacion(nueva: PeticionCotizacion) {
     setCotizando(true);
     setFalla(null);
 
     try {
-      setCotizacion(await cotizar(peticion));
+      const resultado = await cotizar(nueva);
+      setPeticion(nueva);
+      setCotizacion(resultado);
     } catch (error) {
       if (error instanceof ErrorDeCotizacion) {
         setFalla({ mensaje: error.message, detalles: error.detalles });
@@ -34,33 +49,9 @@ export default function App() {
     }
   }
 
-  /**
-   * La insignia de vigencia resume si se puede confiar en la cotización.
-   *
-   * Está arriba y siempre visible porque es lo primero que alguien debería ver:
-   * de nada sirve un total bien calculado con tasas que nadie verificó.
-   */
-  const datosFirmes = cotizacion?.confianza === 'alta';
-
   return (
     <div className="marco">
-      <header className="cinta">
-        <div>
-          <h1 className="cinta__nombre">Aduana-Copilot</h1>
-          <p className="cinta__que-es">
-            Cuánto cuesta importar un medicamento a Jalisco y qué permisos pide
-          </p>
-        </div>
-
-        {cotizacion && (
-          <p className={`vigencia${datosFirmes ? '' : ' vigencia--hueco'}`}>
-            <span className="vigencia__punto" aria-hidden="true" />
-            {datosFirmes
-              ? 'Aranceles verificados en fuente oficial'
-              : 'Aranceles pendientes de verificar'}
-          </p>
-        )}
-      </header>
+      <Encabezado confianza={cotizacion?.confianza ?? null} />
 
       <main className="taller">
         <FormularioCotizacion
@@ -71,30 +62,41 @@ export default function App() {
 
         <div>
           {cotizacion ? (
-            <>
-              <HojaDeLiquidacion cotizacion={cotizacion} />
+            /*
+             * La llave fuerza a React a rehacer el bloque en cada cotización
+             * nueva, y con eso la animación de entrada vuelve a correr. Es la
+             * única animación de la pantalla: marca el momento en que llega el
+             * resultado, que es lo que la persona estaba esperando.
+             */
+            <div className="resultado" key={cotizacion.folio}>
+              <HojaDeLiquidacion cotizacion={cotizacion} peticion={peticion} />
 
+              {/*
+                Dos columnas explícitas en lugar de dejar que la rejilla
+                acomode sola. La lista de documentos es mucho más alta que los
+                demás paneles, y repartiéndolos sin orden quedaban huecos
+                grandes que se leen como si faltara contenido.
+              */}
               <div className="pliegos">
-                <Supuestos supuestos={cotizacion.supuestos} />
-                <Documentos
-                  documentos={cotizacion.documentos}
-                  costosAparte={cotizacion.costos_no_incluidos}
-                />
-                <section className="pliego">
-                  <h2 className="pliego__titulo">Tramo del envío</h2>
-                  <TramoDeEnvio origen={cotizacion.origen} />
-                </section>
+                <div className="columna">
+                  <Supuestos
+                    supuestos={cotizacion.supuestos}
+                    confianza={cotizacion.confianza}
+                  />
+                  <CostosAparte costos={cotizacion.costos_no_incluidos} />
+                  <section className="pliego">
+                    <h2 className="pliego__titulo">Tramo del envío</h2>
+                    <TramoDeEnvio origen={cotizacion.origen} />
+                  </section>
+                </div>
+
+                <div className="columna">
+                  <Documentos documentos={cotizacion.documentos} />
+                </div>
               </div>
-            </>
+            </div>
           ) : (
-            <section className="en-blanco">
-              <h2 className="en-blanco__titulo">Aquí aparece la cotización</h2>
-              <p>
-                Llena la fracción, el origen y los montos, o carga uno de los
-                casos de ejemplo. El desglose llega con la fuente y la fecha de
-                cada cifra, y con los supuestos que hubo que asumir.
-              </p>
-            </section>
+            <Bienvenida />
           )}
         </div>
       </main>

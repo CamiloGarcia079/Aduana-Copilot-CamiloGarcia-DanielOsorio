@@ -1,0 +1,110 @@
+{
+  "_descripcion": "Casos dorados calculados a mano en Excel para validacion formal del motor y del jurado.",
+  "casos": [
+    {
+      "nombre": "caso-1-insulina-patente-igi-0",
+      "por_que_este_caso": "Cubre el camino de medicina de patente con IGI en cero (caso insignia de Jalisco: insulina humana).",
+      "entrada": {
+        "fraccion": "3004.31.02",
+        "valor_mercancia_usd": "25000.00",
+        "flete_usd": "1200.00",
+        "seguro_usd": "300.00",
+        "tipo_de_cambio": "20.0000",
+        "origen": "Alemania",
+        "destino": "Guadalajara, Jalisco",
+        "es_medicina_de_patente": true
+      },
+      "esperado": {
+        "valor_en_aduana_mxn": "530000.00",
+        "igi_mxn": "0.00",
+        "dta_mxn": "4240.00",
+        "iva_mxn": "0.00",
+        "total_mxn": "534240.00"
+      }
+    },
+    {
+      "nombre": "caso-2-medicamento-con-arancel-igi-10",
+      "por_que_este_caso": "Cubre el camino con IGI mayor a cero (10%) para medicamentos importados sin tratado preferencial (India).",
+      "entrada": {
+        "fraccion": "3004.90.99",
+        "valor_mercancia_usd": "15000.00",
+        "flete_usd": "1500.00",
+        "seguro_usd": "250.00",
+        "tipo_de_cambio": "19.5000",
+        "origen": "India",
+        "destino": "Ciudad de México",
+        "es_medicina_de_patente": true
+      },
+      "esperado": {
+        "valor_en_aduana_mxn": "326625.00",
+        "igi_mxn": "32662.50",
+        "dta_mxn": "2613.00",
+        "iva_mxn": "0.00",
+        "total_mxn": "361900.50"
+      }
+    },
+    {
+      "nombre": "caso-3-oncologico-vincristina-suiza",
+      "por_que_este_caso": "Cubre quimioterapia antineoplasica (sulfato de vincristina) exenta de IGI y tasa 0% IVA por patente.",
+      "entrada": {
+        "fraccion": "3004.49.03",
+        "valor_mercancia_usd": "8000.00",
+        "flete_usd": "800.00",
+        "seguro_usd": "150.00",
+        "tipo_de_cambio": "20.5000",
+        "origen": "Suiza",
+        "destino": "Guadalajara, Jalisco",
+        "es_medicina_de_patente": true
+      },
+      "esperado": {
+        "valor_en_aduana_mxn": "183475.00",
+        "igi_mxn": "0.00",
+        "dta_mxn": "1467.80",
+        "iva_mxn": "0.00",
+        "total_mxn": "184942.80"
+      }
+    },
+    {
+      "nombre": "caso-4-insumo-no-patente-iva-16",
+      "por_que_este_caso": "Cubre un insumo no calificado como medicina de patente (partida 3003) que causa tasa general de IVA 16%.",
+      "entrada": {
+        "fraccion": "3003.90.01",
+        "valor_mercancia_usd": "50000.00",
+        "flete_usd": "3000.00",
+        "seguro_usd": "600.00",
+        "tipo_de_cambio": "20.0000",
+        "origen": "Alemania",
+        "destino": "Monterrey, Nuevo León",
+        "es_medicina_de_patente": false
+      },
+      "esperado": {
+        "valor_en_aduana_mxn": "1072000.00",
+        "igi_mxn": "0.00",
+        "dta_mxn": "8576.00",
+        "iva_mxn": "172892.16",
+        "total_mxn": "1253468.16"
+      }
+    },
+    {
+      "nombre": "caso-5-flete-alto-lote-hospitalario",
+      "por_que_este_caso": "Cubre un embarque de alto valor comercial con flete internacional representativo para abastecimiento hospitalario.",
+      "entrada": {
+        "fraccion": "3004.90.20",
+        "valor_mercancia_usd": "200000.00",
+        "flete_usd": "5500.00",
+        "seguro_usd": "2500.00",
+        "tipo_de_cambio": "20.2500",
+        "origen": "Alemania",
+        "destino": "Guadalajara, Jalisco",
+        "es_medicina_de_patente": true
+      },
+      "esperado": {
+        "valor_en_aduana_mxn": "4212000.00",
+        "igi_mxn": "0.00",
+        "dta_mxn": "33696.00",
+        "iva_mxn": "0.00",
+        "total_mxn": "4245696.00"
+      }
+    }
+  ]
+}
